@@ -5,6 +5,7 @@ import (
 	"pagoda/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 )
 
 func Initialize(router *fiber.App) {
@@ -17,7 +18,7 @@ func Initialize(router *fiber.App) {
 
 	router.Use(middleware.Json)
 
-	router.Use(middleware.Security)
+	router.Use(helmet.New())
 
 	users := router.Group("/users")
 
