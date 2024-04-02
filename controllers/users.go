@@ -6,7 +6,6 @@ import (
 	"pagoda/database"
 	"pagoda/middleware"
 	"pagoda/models"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -59,13 +58,10 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Cookie(&fiber.Cookie{
-		Name:    "session",
-		Value:   sessionId,
-		Expires: time.Now().Add(time.Hour * 24 * 30),
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"user": newUser,
+		"key":  sessionId,
 	})
-
-	return c.Status(fiber.StatusCreated).JSON(newUser)
 }
 
 func LoginUser(c *fiber.Ctx) error {
@@ -111,13 +107,10 @@ func LoginUser(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Cookie(&fiber.Cookie{
-		Name:    "session",
-		Value:   sessionId,
-		Expires: time.Now().Add(time.Hour * 24 * 30),
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"user": existingUser,
+		"key":  sessionId,
 	})
-
-	return c.Status(fiber.StatusOK).JSON(existingUser)
 }
 
 func CurrentUser(c *fiber.Ctx) error {
@@ -136,12 +129,6 @@ func LogoutUser(c *fiber.Ctx) error {
 	}
 
 	auth.DeleteSession(session.SessionId)
-
-	c.Cookie(&fiber.Cookie{
-		Name:    "session",
-		Value:   "",
-		Expires: time.Now().Add(-time.Hour),
-	})
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Logged out",

@@ -11,21 +11,22 @@ type Session struct {
 }
 
 func Authenticated(c *fiber.Ctx) error {
-	session := new(Session)
+	authHeader := c.Get("Authorization")
 
-	if err := c.CookieParser(session); err != nil {
+	// check if the header is empty
+	if authHeader == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"errorCode": fiber.StatusUnauthorized,
-			"error":     "Unauthorized",
+			"error": "Unauthorized",
 		})
 	}
 
-	user, err := auth.GetSession(session.SessionId)
+	user, err := auth.GetSession(authHeader)
+
+	// user, err := auth.GetSession(session.SessionId)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"errorCode": fiber.StatusUnauthorized,
-			"error":     "Unauthorized",
+			"error": "Unauthorized",
 		})
 	}
 
